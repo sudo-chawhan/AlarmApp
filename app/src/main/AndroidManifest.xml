@@ -20,7 +20,8 @@
 
         <receiver android:name=".AlarmReceiver" />
 
-        <activity android:name=".AlarmRingActivity"></activity>
+        <activity android:name=".AlarmRingActivity" />
+        <activity android:name=".AlarmSetActivity" android:parentActivityName=".MainActivity"></activity>
     </application>
 
 </manifest>

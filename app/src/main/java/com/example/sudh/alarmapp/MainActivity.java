@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -18,7 +19,7 @@ import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
 
-    SharedPreferences sharedPref;
+    public static SharedPreferences sharedPref;
 
     String TAG = "MainActivity";
     @Override
@@ -29,46 +30,26 @@ public class MainActivity extends AppCompatActivity {
 //        SharedPreferences.Editor editor = sharedPref.edit();
 //        editor.putInt(getString(R.string.saved_high_score_key), newHighScore);
 //        editor.commit();
-        final TimePicker timePicker = (TimePicker) findViewById(R.id.timePicker);
-        Button button = (Button) findViewById(R.id.button);
-        button.setOnClickListener(new View.OnClickListener() {
+        TextView alarmInfo = (TextView) findViewById(R.id.alarmInfo);
+        if(sharedPref.contains("HR")){
+            alarmInfo.setText("Alarm set for " + sharedPref.getInt("HR", 0) + ":" + sharedPref.getInt("MN", 0));
+
+        }
+
+        Button setButton = (Button) findViewById(R.id.setButton);
+        setButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "alarm set for " + timePicker.getHour() + ":"+ timePicker.getMinute(), Toast.LENGTH_LONG);
-                setAlarm(getApplicationContext(), timePicker.getHour(), timePicker.getMinute());
+                Intent alarmService = new Intent(getApplicationContext(),AlarmSetActivity.class);
+                alarmService.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                getApplicationContext().startActivity(alarmService);
             }
         });
 
-    }
-    private void setAlarm(Context context, int alarmHr, int alarmMn){
-        // set a repeating alarm
-        int seconds = 1;
-//        int alarmHr = 17;
-//        int alarmMn = 51;
-//        Log.d(TAG, "setAlarm: entered");
-        Intent alarmIntent = new Intent(context, AlarmReceiver.class);
-        PendingIntent sender = PendingIntent.getBroadcast(context, 0, alarmIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-        /////
-        // get a Calendar object with current time
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.HOUR_OF_DAY, alarmHr);
-        calendar.set(Calendar.MINUTE, alarmMn);
-//        ((AlarmManager) getSystemService(ALARM_SERVICE)).set(
-//                AlarmManager.RTC, calendar.getTimeInMillis(), sender);
-//        Toast.makeText(MainActivity.this, "Timer set to " + seconds + " seconds.",
-//                Toast.LENGTH_SHORT).show();
-        AlarmManager am = (AlarmManager) context.getSystemService(context.ALARM_SERVICE);
-//
-        am.cancel(sender); // cancel others.
-//
-//        am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+1000,
-//                10*1000, sender);
-
-        am.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                AlarmManager.INTERVAL_DAY, sender);
     }
+
 
 }
 
